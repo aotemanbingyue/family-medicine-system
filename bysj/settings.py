@@ -21,7 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h#s-v-)l1-71pt(7=h)bk#sya_pfg-ft0fwl)@gxy6%)0hn%h!'
+# 从环境变量读取，本地开发未设置时使用占位符（生产必须设置 DJANGO_SECRET_KEY）
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or 'django-insecure-dev-only-change-in-production'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -85,11 +86,11 @@ DATABASES = {
 } if DB_USE_SQLITE else {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bysj',
-        'USER': 'root',
-        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', '123456'),
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': os.environ.get('DJANGO_DB_NAME', 'bysj'),
+        'USER': os.environ.get('DJANGO_DB_USER', 'root'),
+        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
+        'HOST': os.environ.get('DJANGO_DB_HOST', '127.0.0.1'),
+        'PORT': os.environ.get('DJANGO_DB_PORT', '3306'),
         'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
