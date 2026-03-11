@@ -1,0 +1,24 @@
+{% extends 'app/base.html' %}
+{% block title %}{{ title }} - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">{{ title }}</h2>
+<div class="alert alert-info">
+    普通用户发布后将进入“双审核”：先由帖子管理员审核帖子内容，再由药品管理员审核帖子内药品。两者都通过后，帖子才会在共享广场展示。
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">发布</button>
+            <a href="{% url 'share_list' %}" class="btn btn-outline-secondary">取消</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

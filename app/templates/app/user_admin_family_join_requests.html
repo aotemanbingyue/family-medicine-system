@@ -1,0 +1,44 @@
+{% extends 'app/base.html' %}
+{% block title %}入组审核 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">入组审核（用户管理员）</h2>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>申请人</th>
+                    <th>手机号</th>
+                    <th>目标家庭组ID</th>
+                    <th>申请时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in requests %}
+                <tr>
+                    <td>{{ r.applicant.username }}</td>
+                    <td>{{ r.applicant.phone|default:'-' }}</td>
+                    <td><code>{{ r.target_family_id }}</code></td>
+                    <td>{{ r.create_time }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <form method="post" action="{% url 'user_admin_family_join_approve' r.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">通过</button>
+                            </form>
+                            <form method="post" action="{% url 'user_admin_family_join_reject' r.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定驳回该申请吗？');">驳回</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">暂无待审核入组申请</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

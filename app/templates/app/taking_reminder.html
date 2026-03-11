@@ -1,0 +1,40 @@
+{% extends 'app/base.html' %}
+{% block title %}服药提醒 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-3">服药提醒</h2>
+<p class="text-muted">当前时间：{{ now_time|time:"H:i" }}。该页面按你在家庭药箱中设置的“每日提醒时间”展示。</p>
+
+<div class="card mb-4">
+    <div class="card-header">已到提醒时间</div>
+    <ul class="list-group list-group-flush">
+        {% for m in due_now %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">{{ m.name }}</div>
+                {% if m.dosage_note %}<div class="small text-muted">{{ m.dosage_note }}</div>{% endif %}
+            </div>
+            <span class="badge bg-danger">提醒 {{ m.daily_reminder_time|time:"H:i" }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted text-center">当前没有已到点的服药提醒</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">稍后提醒</div>
+    <ul class="list-group list-group-flush">
+        {% for m in due_later %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">{{ m.name }}</div>
+                {% if m.dosage_note %}<div class="small text-muted">{{ m.dosage_note }}</div>{% endif %}
+            </div>
+            <span class="badge bg-secondary">提醒 {{ m.daily_reminder_time|time:"H:i" }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted text-center">今天后续没有新的提醒</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

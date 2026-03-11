@@ -1,0 +1,49 @@
+{% extends 'app/base.html' %}
+{% block title %}标准药库 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>全局标准药库（药品管理员）</h2>
+    <div class="d-flex gap-2">
+        <form method="post" action="{% url 'global_medicine_sync' %}" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="mode" value="incremental">
+            <button type="submit" class="btn btn-outline-primary">一键增量同步</button>
+        </form>
+        <form method="post" action="{% url 'global_medicine_sync' %}" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="mode" value="overwrite">
+            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('将先软删除现有启用药品，再按内置数据重建。确定继续？');">覆盖同步</button>
+        </form>
+        <a href="{% url 'global_medicine_add' %}" class="btn btn-primary">添加标准药品</a>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>通用名</th>
+                    <th>分类</th>
+                    <th>条形码/国药准字</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in medicines %}
+                <tr>
+                    <td>{{ m.name }}</td>
+                    <td>{{ m.get_category_display }}</td>
+                    <td>{{ m.barcode }}</td>
+                    <td>
+                        <a href="{% url 'global_medicine_edit' m.pk %}" class="btn btn-sm btn-outline-primary">编辑</a>
+                        <a href="{% url 'global_medicine_delete' m.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定软删除？');">删除</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted">暂无标准药品</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

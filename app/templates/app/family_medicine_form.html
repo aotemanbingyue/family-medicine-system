@@ -1,0 +1,24 @@
+{% extends 'app/base.html' %}
+{% block title %}{{ title }} - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">{{ title }}</h2>
+<div class="alert alert-info">
+    普通用户提交药品后需要经过药品管理员审核，审核通过后才会进入过期提醒、家庭组汇总和共享转让流程。
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">保存</button>
+            <a href="{% url 'family_medicine_list' %}" class="btn btn-outline-secondary">取消</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

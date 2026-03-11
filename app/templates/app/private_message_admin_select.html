@@ -1,0 +1,35 @@
+{% extends 'app/base.html' %}
+{% block title %}联系管理员 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-3">联系管理员</h2>
+<p class="text-muted">请选择要咨询的管理员，进入后可发送私聊消息。</p>
+
+{% if primary_admin %}
+<div class="alert alert-primary d-flex justify-content-between align-items-center">
+    <div>常用快捷：优先联系 <strong>{{ primary_admin.username }}</strong>（{{ primary_admin.get_role_display }}）</div>
+    <a href="{% url 'private_message_chat_with_admin' primary_admin.pk %}" class="btn btn-primary btn-sm">一键联系首选管理员</a>
+</div>
+{% endif %}
+
+<div class="card rounded-4 shadow-sm">
+    <div class="card-body">
+        {% if admins %}
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            {% for a in admins %}
+            <div class="col">
+                <div class="border rounded-3 p-3 h-100 d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-semibold">{{ a.username }}</div>
+                        <div class="small text-muted">{{ a.get_role_display }}</div>
+                    </div>
+                    <a href="{% url 'private_message_chat_with_admin' a.pk %}" class="btn btn-primary btn-sm">发起私聊</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-muted">当前暂无可联系的管理员账号。</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'app/base.html' %}
+{% block title %}共享广场 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>共享广场</h2>
+    {% if user.is_authenticated %}<a href="{% url 'share_create' %}" class="btn btn-primary">发布转让</a>{% endif %}
+</div>
+<div class="row g-4">
+    {% for p in posts %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ p.title }}</h5>
+                <p class="card-text text-muted small">药品：{{ p.medicine.name }} · 发布人 {{ p.user.username }}</p>
+                <p class="small mb-2">
+                    <span class="badge bg-success">帖子审核通过</span>
+                    <span class="badge bg-success">药品审核通过</span>
+                </p>
+                <p class="card-text text-secondary">{{ p.content|truncatechars:60 }}</p>
+                <a href="{% url 'share_detail' p.pk %}" class="btn btn-outline-primary btn-sm">查看详情</a>
+            </div>
+            <div class="card-footer bg-transparent text-muted small">{{ p.create_time }}</div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center text-muted py-5">暂无已通过审核的转让帖子</div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'app/base.html' %}
+{% block title %}药箱药品审核 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">药箱药品审核（药品管理员）</h2>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>归属用户</th>
+                    <th>药品名称</th>
+                    <th>分类</th>
+                    <th>生产/过期日期</th>
+                    <th>剩余</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in medicines %}
+                <tr>
+                    <td>{{ m.owner.username }}</td>
+                    <td>{{ m.name }}</td>
+                    <td>{% if m.global_info %}{{ m.global_info.get_category_display }}{% else %}—{% endif %}</td>
+                    <td>{{ m.production_date }} / {{ m.expiration_date }}</td>
+                    <td>{{ m.stock }}{{ m.unit }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <form method="post" action="{% url 'family_medicine_audit_approve' m.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">通过</button>
+                            </form>
+                            <form method="post" action="{% url 'family_medicine_audit_reject' m.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定驳回该药品吗？');">驳回</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">暂无待审核药品</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

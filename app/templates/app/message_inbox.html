@@ -1,0 +1,104 @@
+{% extends 'app/base.html' %}
+{% block title %}消息中心 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">消息中心</h2>
+<p class="text-muted">这里是统一“用户信箱”：聚合私聊、帖子互动、系统公告和医学小贴士，底层仍按模块维护，方便后续扩展。</p>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>私聊消息</span>
+        {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
+        <a href="{% url 'private_message_admin_inbox' %}" class="btn btn-sm btn-outline-primary">进入管理员私聊收件箱</a>
+        {% else %}
+        <a href="{% url 'private_message_admin_select' %}" class="btn btn-sm btn-primary">联系管理员</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
+        <p class="mb-0 text-muted">您可以在“管理员私聊收件箱”中查看普通用户向您发起的咨询并进行回复。</p>
+        {% else %}
+        <p class="mb-0 text-muted">
+            普通用户可私聊任意管理员（用户管理员 / 药品管理员 / 帖子管理员 / 系统管理员）。
+            {% if unread_private_count %}<span class="badge bg-danger ms-1">{{ unread_private_count }} 条私聊未读</span>{% endif %}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between">
+                <span>系统公告（最近5条）</span>
+                <a href="{% url 'announcement_list' %}" class="small text-decoration-none">查看全部</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for a in recent_announcements %}
+                <li class="list-group-item">
+                    {% if a.is_pinned %}<span class="badge bg-warning text-dark me-1">置顶</span>{% endif %}
+                    {{ a.title }}
+                    <div class="small text-muted mt-1">{{ a.create_time }}</div>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted text-center">暂无公告</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between">
+                <span>医学小贴士（最近5条）</span>
+                <a href="{% url 'medical_tip_list' %}" class="small text-decoration-none">查看全部</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for t in recent_tips %}
+                <li class="list-group-item">
+                    {{ t.tip_date }} · {{ t.title }}
+                </li>
+                {% empty %}
+                <li class="list-group-item text-muted text-center">暂无小贴士</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">别人在我帖子下的留言</div>
+    <ul class="list-group list-group-flush">
+        {% for c in comments %}
+        <li class="list-group-item d-flex justify-content-between align-items-start {% if not c.read_at %}list-group-item-warning{% endif %}">
+            <div class="ms-2 me-auto">
+                <a href="{% url 'share_detail' c.post_id %}" class="fw-bold text-decoration-none">{{ c.post.title }}</a>
+                <div class="small text-muted mt-1"><strong>{{ c.user.username }}</strong> 留言：{{ c.content }}</div>
+                <span class="small text-muted">{{ c.create_time }}</span>
+                {% if not c.read_at %}<span class="badge bg-primary ms-2">未读</span>{% endif %}
+            </div>
+            <a href="{% url 'share_detail' c.post_id %}" class="btn btn-sm btn-outline-primary">查看帖子</a>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center text-muted">暂无</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">别人回复我的留言</div>
+    <ul class="list-group list-group-flush">
+        {% for r in replies_to_me %}
+        <li class="list-group-item d-flex justify-content-between align-items-start {% if not r.read_at %}list-group-item-warning{% endif %}">
+            <div class="ms-2 me-auto">
+                <a href="{% url 'share_detail' r.comment.post_id %}" class="fw-bold text-decoration-none">{{ r.comment.post.title }}</a>
+                <div class="small text-muted mt-1"><strong>{{ r.user.username }}</strong> 回复了您的留言：{{ r.content }}</div>
+                <span class="small text-muted">{{ r.create_time }}</span>
+                {% if not r.read_at %}<span class="badge bg-primary ms-2">未读</span>{% endif %}
+            </div>
+            <a href="{% url 'share_detail' r.comment.post_id %}" class="btn btn-sm btn-outline-primary">查看帖子</a>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center text-muted">暂无</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

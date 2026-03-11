@@ -1,0 +1,62 @@
+{% extends 'app/base.html' %}
+{% block title %}家庭组 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">家庭组协作</h2>
+{% if no_family %}
+<div class="alert alert-info">
+    <strong>您还未加入家庭组。</strong> 请点击下方按钮，创建新家庭组或加入家人已有的家庭组。
+</div>
+<div class="mb-4">
+    <a href="{% url 'family_group_manage' %}" class="btn btn-primary btn-lg">加入或创建家庭组</a>
+</div>
+{% else %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span>家庭成员 · 共 {{ members|length }} 人</span>
+        <a href="{% url 'family_group_manage' %}" class="btn btn-outline-primary btn-sm">邀请家人 / 修改家庭组</a>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small mb-3">邀请方式：将下方「家庭组ID」告知家人，他们在「加入或创建家庭组」页面选择「加入已有家庭组」并填写此ID即可。</p>
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="fw-semibold">家庭组ID：</span>
+            <code class="p-2 bg-light rounded" style="font-size: 1rem;">{{ family_id }}</code>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText('{{ family_id }}'); alert('已复制到剪贴板');">复制</button>
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for u in members %}
+            <li class="list-group-item px-0">{{ u.username }}{% if u.phone %} · {{ u.phone }}{% endif %}</li>
+            {% empty %}
+            <li class="list-group-item px-0 text-muted">暂无其他成员</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">家庭药箱汇总</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>归属人</th>
+                    <th>药品名称</th>
+                    <th>过期日期</th>
+                    <th>剩余</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in family_medicines %}
+                <tr>
+                    <td>{{ m.owner.username }}</td>
+                    <td>{{ m.name }}</td>
+                    <td>{{ m.expiration_date }}</td>
+                    <td>{{ m.stock }}{{ m.unit }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted">暂无药品</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

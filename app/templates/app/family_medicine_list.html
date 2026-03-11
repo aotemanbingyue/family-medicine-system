@@ -1,0 +1,58 @@
+{% extends 'app/base.html' %}
+{% block title %}家庭药箱 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>家庭药箱</h2>
+    <a href="{% url 'family_medicine_add' %}" class="btn btn-primary">添加药品</a>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>药品名称</th>
+                    <th>分类</th>
+                    <th>生产/过期日期</th>
+                    <th>剩余</th>
+                    <th>服药提醒</th>
+                    <th>审核状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in medicines %}
+                <tr>
+                    <td>{{ m.name }}</td>
+                    <td>{% if m.global_info %}{{ m.global_info.get_category_display }}{% else %}—{% endif %}</td>
+                    <td>{{ m.production_date }} / {{ m.expiration_date }}</td>
+                    <td>{{ m.stock }}{{ m.unit }}</td>
+                    <td>
+                        {% if m.reminder_enabled and m.daily_reminder_time %}
+                        <span class="badge bg-info text-dark">{{ m.daily_reminder_time }}</span>
+                        {% if m.dosage_note %}<div class="small text-muted mt-1">{{ m.dosage_note }}</div>{% endif %}
+                        {% else %}
+                        <span class="text-muted">未开启</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if m.audit_status == 1 %}
+                        <span class="badge bg-success">审核通过</span>
+                        {% elif m.audit_status == 0 %}
+                        <span class="badge bg-warning text-dark">待审核</span>
+                        {% else %}
+                        <span class="badge bg-danger">审核驳回</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'family_medicine_edit' m.pk %}" class="btn btn-sm btn-outline-primary">编辑</a>
+                        <a href="{% url 'family_medicine_delete' m.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定移除？');">移除</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted">暂无药品，<a href="{% url 'family_medicine_add' %}">去添加</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

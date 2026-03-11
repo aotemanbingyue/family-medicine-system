@@ -1,0 +1,42 @@
+{% extends 'app/base.html' %}
+{% block title %}设置家庭组 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">设置家庭组</h2>
+<p class="text-muted mb-4">与家人填写相同的家庭组ID，即可互相查看药箱。您可以选择创建新家庭组，或申请加入家人已有的家庭组（需用户管理员审核）。</p>
+<div class="card" style="max-width: 480px;">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="form-label fw-semibold">选择操作</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="action" id="action_create" value="create" checked>
+                    <label class="form-check-label" for="action_create">创建新家庭组</label>
+                </div>
+                <p class="form-text small text-muted">系统将为您生成一个唯一的家庭组ID，您可将其告知家人。</p>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="radio" name="action" id="action_join" value="join">
+                    <label class="form-check-label" for="action_join">加入已有家庭组</label>
+                </div>
+                <p class="form-text small text-muted">输入家人分享给您的家庭组ID后，将提交申请，需用户管理员审核通过后生效。</p>
+            </div>
+            <div class="mb-4" id="join-field">
+                <label for="id_family_id" class="form-label">家庭组ID</label>
+                {{ form.family_id }}
+                {% if form.family_id.help_text %}<p class="form-text small">{{ form.family_id.help_text }}</p>{% endif %}
+                {% if form.family_id.errors %}<div class="invalid-feedback d-block">{{ form.family_id.errors.0 }}</div>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">确认</button>
+            <a href="{% url 'family_group' %}" class="btn btn-outline-secondary ms-2">返回</a>
+        </form>
+    </div>
+</div>
+<script>
+document.querySelectorAll('input[name="action"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+        document.getElementById('join-field').style.display = this.value === 'join' ? 'block' : 'none';
+    });
+});
+document.getElementById('join-field').style.display = document.getElementById('action_join').checked ? 'block' : 'none';
+</script>
+{% endblock %}

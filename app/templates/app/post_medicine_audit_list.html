@@ -1,0 +1,48 @@
+{% extends 'app/base.html' %}
+{% block title %}帖子药品审核 - 药品管理系统{% endblock %}
+{% block content %}
+<h2 class="mb-4">待审核帖子药品（药品管理员）</h2>
+<div class="alert alert-info">
+    该页面用于审核“帖子内药品是否合规”。只有通过后，普通用户才能将帖子药品加入家庭药箱。
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>帖子标题</th>
+                    <th>发布人</th>
+                    <th>药品</th>
+                    <th>过期日期</th>
+                    <th>发布时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in posts %}
+                <tr>
+                    <td>{{ p.title }}</td>
+                    <td>{{ p.user.username }}</td>
+                    <td>{{ p.medicine.name }}</td>
+                    <td>{{ p.medicine.expiration_date }}</td>
+                    <td>{{ p.create_time }}</td>
+                    <td>
+                        <a href="{% url 'share_detail' p.pk %}" class="btn btn-sm btn-outline-secondary" target="_blank">查看</a>
+                        <form method="post" action="{% url 'post_medicine_audit_approve' p.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">通过</button>
+                        </form>
+                        <form method="post" action="{% url 'post_medicine_audit_reject' p.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定驳回该帖子药品？');">驳回</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">暂无待审核帖子药品</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

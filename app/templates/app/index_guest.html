@@ -1,0 +1,47 @@
+{% extends 'app/base.html' %}
+{% block title %}首页 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="text-center py-3 mb-4">
+    <h1 class="mb-2 fw-bold" style="color: var(--primary-dark);">家庭药品管理系统</h1>
+    <p class="lead text-secondary mb-4">管理家庭药箱、过期提醒、药品共享与家庭协作</p>
+
+    {% if announcements %}
+    <div class="card mb-4 mx-auto" style="max-width: 760px;">
+        <div class="card-header">系统公告</div>
+        <ul class="list-group list-group-flush">
+            {% for a in announcements %}
+            <li class="list-group-item">
+                {% if a.is_pinned %}<span class="badge bg-warning text-dark me-2">置顶</span>{% endif %}
+                <strong>{{ a.title }}</strong> · <span class="text-muted small">{{ a.create_time }}</span>
+                <div class="mt-1 text-secondary small">{{ a.content|truncatewords:20 }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="card-footer bg-transparent"><a href="{% url 'announcement_list' %}" class="text-primary text-decoration-none">查看全部</a></div>
+    </div>
+    {% endif %}
+
+    <div class="index-grid index-grid-guest mx-auto">
+        <a href="{% url 'login' %}" class="index-tile index-tile-primary text-decoration-none">
+            <span class="index-tile-icon">🔐</span>
+            <span class="index-tile-title">登录</span>
+            <span class="index-tile-desc">已有账号请登录</span>
+        </a>
+        <a href="{% url 'register' %}" class="index-tile index-tile-primary text-decoration-none">
+            <span class="index-tile-icon">📋</span>
+            <span class="index-tile-title">注册</span>
+            <span class="index-tile-desc">新用户请注册</span>
+        </a>
+        <a href="{% url 'global_medicine_search' %}" class="index-tile text-decoration-none">
+            <span class="index-tile-icon">🔍</span>
+            <span class="index-tile-title">药品查询</span>
+            <span class="index-tile-desc">无需登录即可查询</span>
+        </a>
+        <a href="{% url 'announcement_list' %}" class="index-tile text-decoration-none">
+            <span class="index-tile-icon">📢</span>
+            <span class="index-tile-title">系统公告</span>
+            <span class="index-tile-desc">查看系统公告</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

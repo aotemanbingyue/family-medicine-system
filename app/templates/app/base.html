@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}药品管理系统{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{% static 'app/style.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">药品管理系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="切换导航">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nav">
+                <ul class="navbar-nav me-auto nav-by-function">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">📦 个人药箱</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'family_medicine_list' %}">家庭药箱</a></li>
+                            <li><a class="dropdown-item" href="{% url 'taking_reminder' %}">服药提醒</a></li>
+                            <li><a class="dropdown-item" href="{% url 'expiration_reminder' %}">过期提醒{% if expiration_alert_count %} <span class="badge bg-danger ms-1">{{ expiration_alert_count }}</span>{% endif %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'family_group' %}">家庭组</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">🔄 共享转让</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'share_list' %}">浏览转让</a></li>
+                            <li><a class="dropdown-item" href="{% url 'share_my_list' %}">我的帖子{% if my_posts_alert_count %} <span class="badge bg-warning text-dark ms-1">{{ my_posts_alert_count }}</span>{% endif %}</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'message_inbox' %}">消息中心{% if unread_comment_count %} <span class="badge bg-danger ms-1">{{ unread_comment_count }}</span>{% endif %}</a></li>
+                            {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
+                            <li><a class="dropdown-item" href="{% url 'private_message_admin_inbox' %}">私聊收件箱</a></li>
+                            {% else %}
+                            <li><a class="dropdown-item" href="{% url 'private_message_admin_select' %}">联系管理员</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'global_medicine_search' %}">🔍 药品查询</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'announcement_list' %}">📢 系统公告</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'medical_tip_list' %}">🩺 医学小贴士</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'article_list' %}">📖 外刊阅读</a></li>
+                    {% if user.is_authenticated %}
+                    {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle nav-link-admin" href="#" data-bs-toggle="dropdown" aria-expanded="false">⚙️ 管理后台</a>
+                        <ul class="dropdown-menu">
+                            {% if user.role == 'admin_user' or user.role == 'admin_sys' %}
+                            <li><a class="dropdown-item" href="{% url 'user_admin_list' %}">用户管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user_admin_family_join_requests' %}">入组审核{% if pending_family_join_count %} <span class="badge bg-danger ms-1">{{ pending_family_join_count }}</span>{% endif %}</a></li>
+                            {% endif %}
+                            {% if user.role == 'admin_med' or user.role == 'admin_sys' %}
+                            <li><a class="dropdown-item" href="{% url 'global_medicine_list' %}">标准药库</a></li>
+                            <li><a class="dropdown-item" href="{% url 'family_medicine_audit_list' %}">药箱药品审核{% if pending_family_medicine_count %} <span class="badge bg-danger ms-1">{{ pending_family_medicine_count }}</span>{% endif %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'post_medicine_audit_list' %}">帖子药品审核{% if pending_post_medicine_count %} <span class="badge bg-danger ms-1">{{ pending_post_medicine_count }}</span>{% endif %}</a></li>
+                            {% endif %}
+                            {% if user.role == 'admin_post' or user.role == 'admin_sys' %}
+                            <li><a class="dropdown-item" href="{% url 'post_audit_list' %}">帖子审核{% if pending_audit_count %} <span class="badge bg-danger ms-1">{{ pending_audit_count }}</span>{% endif %}</a></li>
+                            {% endif %}
+                            {% if user.role == 'admin_sys' %}
+                            <li><a class="dropdown-item" href="{% url 'announcement_create' %}">发布公告</a></li>
+                            <li><a class="dropdown-item" href="{% url 'medical_tip_create' %}">发布医学小贴士</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="userDropdown">{{ user.username }} <span class="badge {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}badge-role-admin{% else %}badge-role-user{% endif %}">{{ user.get_role_display }}</span></a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{% url 'message_inbox' %}">消息中心{% if unread_comment_count %}<span class="badge bg-danger ms-1">{{ unread_comment_count }}</span>{% endif %}</a></li>
+                            {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
+                            <li><a class="dropdown-item" href="{% url 'private_message_admin_inbox' %}">私聊收件箱</a></li>
+                            {% else %}
+                            <li><a class="dropdown-item" href="{% url 'private_message_admin_select' %}">联系管理员</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'share_my_list' %}">我的帖子{% if my_posts_alert_count %}<span class="badge bg-warning text-dark ms-1">{{ my_posts_alert_count }}</span>{% endif %}</a></li>
+                            {% if user.is_staff %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/admin/" target="_blank">后台管理</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item border-0 bg-transparent w-100 text-start">退出</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">登录</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% if messages %}
+        <div id="alert-wrap" class="mb-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="关闭"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="app-footer">
+        <div class="container">家庭药品管理系统 · 毕业设计</div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script>window.Vue = Vue;</script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

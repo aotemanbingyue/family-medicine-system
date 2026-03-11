@@ -1,0 +1,75 @@
+{% extends 'app/base.html' %}
+{% block title %}用户管理 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <h2 class="mb-0">用户管理（用户管理员）</h2>
+    <a href="{% url 'user_admin_family_join_requests' %}" class="btn btn-outline-primary">查看入组审核</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label for="q" class="form-label">关键字搜索</label>
+                <input type="text" id="q" name="q" class="form-control" value="{{ keyword }}" placeholder="用户名 / 手机号 / 家庭组ID">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">查询</button>
+                <a href="{% url 'user_admin_list' %}" class="btn btn-outline-secondary ms-1">重置</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>用户名</th>
+                    <th>角色</th>
+                    <th>手机号</th>
+                    <th>家庭组ID</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.username }}</td>
+                    <td><span class="badge bg-light text-dark">{{ u.get_role_display }}</span></td>
+                    <td>{{ u.phone|default:'-' }}</td>
+                    <td>{{ u.family_id|default:'-' }}</td>
+                    <td>
+                        {% if u.is_active %}
+                        <span class="badge bg-success">启用中</span>
+                        {% else %}
+                        <span class="badge bg-secondary">已禁用</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <form method="post" action="{% url 'user_admin_toggle_active' u.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" {% if u.pk == user.pk %}disabled{% endif %}>
+                                    {% if u.is_active %}禁用{% else %}启用{% endif %}
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'user_admin_reset_password' u.pk %}" onsubmit="return confirm('确定将该用户密码重置为 123456 吗？');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-primary" {% if u.pk == user.pk %}disabled{% endif %}>重置密码</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted">暂无匹配用户</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-text mt-2">说明：重置密码功能用于课程项目演示，默认重置为 <code>123456</code>。</div>
+{% endblock %}

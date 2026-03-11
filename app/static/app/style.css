@@ -1,0 +1,345 @@
+/* 药品管理系统 - 统一主题（偏医疗/健康风格） */
+:root {
+  --primary: #0d9488;
+  --primary-dark: #0f766e;
+  --primary-light: #14b8a6;
+  --secondary: #64748b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg-page: #f1f5f9;
+  --bg-card: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-hover: 0 4px 12px rgba(15, 118, 110, .15);
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 导航栏 */
+.navbar {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+  box-shadow: var(--shadow);
+}
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.nav-link {
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: background .2s, color .2s;
+}
+.nav-link:hover {
+  background: rgba(255,255,255,.15);
+  color: #fff !important;
+}
+.nav-link .nav-badge {
+  font-size: 0.7rem;
+  min-width: 1.1em;
+  vertical-align: middle;
+}
+
+/* 主内容区 */
+main {
+  flex: 1;
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+/* 卡片 */
+.card {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow .25s, transform .25s;
+}
+.card:hover {
+  box-shadow: var(--shadow-hover);
+}
+.card-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+  color: var(--text);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: .85rem 1.25rem;
+}
+
+/* 按钮 */
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn-outline-primary:hover {
+  background: rgba(13, 148, 136, .08);
+  color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+.btn-warning {
+  background: var(--warning);
+  border-color: var(--warning);
+  color: #fff;
+}
+
+/* 页面标题 */
+h1, h2 {
+  color: var(--text);
+  font-weight: 700;
+}
+h2 { font-size: 1.5rem; }
+
+/* 首页卡片增强 */
+.index-card {
+  border-left: 4px solid var(--primary);
+}
+.index-card .card-title {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+/* 列表与表格 */
+.list-group-item {
+  border-color: #f1f5f9;
+  padding: .85rem 1.25rem;
+}
+.table th {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 页脚 */
+.app-footer {
+  background: var(--bg-card);
+  border-top: 1px solid #e2e8f0;
+  padding: .75rem 0;
+  margin-top: auto;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: .875rem;
+}
+
+/* 登录/注册卡片 */
+.auth-card .card {
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: var(--radius);
+}
+
+/* 消息/徽章 */
+.badge.bg-danger { background: var(--danger) !important; }
+.badge.bg-warning { background: var(--warning) !important; color: #fff !important; }
+.alert { border-radius: var(--radius-sm); }
+
+/* 导航按功能分组 */
+.nav-by-function .nav-item { margin-right: 0.25rem; }
+.nav-by-function .dropdown-menu {
+  border: none;
+  box-shadow: var(--shadow-hover);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0;
+}
+.nav-by-function .dropdown-item {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  margin: 0 0.35rem;
+  font-weight: 500;
+}
+.nav-by-function .dropdown-item:hover {
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--primary-dark);
+}
+.nav-link-admin { background: rgba(255,255,255,.12); border-radius: var(--radius-sm); }
+.nav-link-admin:hover { background: rgba(255,255,255,.2) !important; }
+.badge-role-admin { background: #f59e0b !important; color: #fff !important; font-weight: 600; }
+.badge-role-user { background: rgba(255,255,255,.9) !important; color: var(--text) !important; }
+
+/* 首页功能分区 */
+.func-section { margin-bottom: 2.25rem; }
+.func-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--primary-light);
+}
+.func-cards { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.func-card {
+  flex: 1 1 160px;
+  min-width: 160px;
+  max-width: 220px;
+  padding: 1.5rem 1.25rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow .25s, transform .15s;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+.func-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.func-card .func-icon { font-size: 2.25rem; margin-bottom: 0.6rem; line-height: 1; }
+.func-card .func-title { font-weight: 600; font-size: 1rem; color: var(--text); margin-bottom: 0.3rem; }
+.func-card .func-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.9rem; line-height: 1.4; }
+
+/* 按钮按功能区分：主操作 / 次操作 / 辅助操作 */
+.func-card .btn-func-primary {
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  min-width: 5rem;
+}
+.func-card .btn-func-secondary {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.45rem 1rem;
+  min-width: 4.5rem;
+}
+.func-card .btn-func-tertiary {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  min-width: 4rem;
+}
+
+/* 游客页：账号卡片略大、更醒目 */
+.func-section-guest { max-width: 560px; }
+.func-card-emphasis {
+  min-width: 170px;
+  max-width: 240px;
+  padding: 1.6rem 1.35rem;
+}
+.func-card-emphasis .func-icon { font-size: 2.5rem; }
+
+/* 首页 App Grid 风格（功能引导大文件夹） */
+.index-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  max-width: 520px;
+}
+.index-tile {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: var(--bg-card);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  border: 1px solid #e2e8f0;
+  transition: box-shadow .3s, transform .25s ease;
+  color: var(--text);
+}
+.index-tile:hover {
+  box-shadow: 0 8px 24px rgba(15, 118, 110, .2), 0 4px 8px rgba(0,0,0,.08);
+  transform: translateY(-4px) scale(1.02);
+  color: var(--text);
+}
+.index-tile-icon { font-size: 2.75rem; margin-bottom: 0.5rem; line-height: 1; }
+.index-tile-title { font-weight: 600; font-size: 1.05rem; }
+.index-tile-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+.index-tile-admin { border-color: rgba(245, 158, 11, 0.5); background: linear-gradient(135deg, #fffbeb 0%, #fff 100%); }
+.index-tile-primary { background: linear-gradient(135deg, #ecfdf5 0%, #fff 100%); border-color: rgba(13, 148, 136, 0.25); }
+.index-grid-guest { grid-template-columns: repeat(2, 1fr); max-width: 400px; }
+.index-grid-guest .index-tile { padding: 1.5rem; }
+.index-grid-guest .index-tile-icon { font-size: 3rem; }
+@media (min-width: 576px) {
+  .index-grid { max-width: 560px; gap: 1.5rem; }
+  .index-tile-icon { font-size: 3rem; }
+  .index-grid-guest { max-width: 440px; }
+}
+
+/* ========== 首页仪表盘：手机大文件夹风格 ========== */
+.index-dashboard { max-width: 100%; }
+.index-dashboard h2 { font-size: 1.75rem; font-weight: 700; }
+.index-dashboard .row-cols-md-4 .col { min-height: 140px; }
+@media (min-width: 768px) {
+  .index-dashboard .row-cols-md-4 .col { min-height: 160px; }
+}
+
+/* 顶部统计区：马卡龙色小卡片 */
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 0.75rem;
+  min-height: 110px;
+  border: none;
+  transition: box-shadow .3s, transform .25s ease;
+}
+.stat-card-hover:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12) !important;
+}
+/* 柔和配色：薄荷绿、豆沙粉、淡薰衣草、青瓷色（避免刺眼蓝） */
+.stat-card-blue { background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%); color: #047857; }
+.stat-card-red { background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%); color: #9d174d; }
+.stat-card-purple { background: linear-gradient(135deg, #ede9fe 0%, #f5f3ff 100%); color: #5b21b6; }
+.stat-card-teal { background: linear-gradient(135deg, #ccfbf1 0%, #f0fdfa 100%); color: #0f766e; }
+.stat-card-icon { font-size: 1.75rem; margin-bottom: 0.35rem; opacity: 0.9; }
+.stat-card-num { font-size: 1.75rem; font-weight: 700; line-height: 1.2; }
+.stat-card-label { font-size: 0.85rem; opacity: 0.9; }
+@media (min-width: 768px) {
+  .stat-card { min-height: 120px; padding: 1.5rem 1rem; }
+  .stat-card-icon { font-size: 2rem; }
+  .stat-card-num { font-size: 2rem; }
+}
+
+/* 核心功能区：大方块（手机桌面文件夹） */
+.action-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  min-height: 130px;
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border: 1px solid #e2e8f0;
+  color: var(--text);
+  transition: box-shadow .35s ease, transform .3s ease;
+}
+.action-tile:hover {
+  color: var(--text);
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(0,0,0,.12), 0 4px 12px rgba(15, 118, 110, .15) !important;
+}
+.action-tile-icon { font-size: 2.25rem; margin-bottom: 0.5rem; color: var(--primary); }
+.action-tile-title { font-weight: 600; font-size: 1rem; text-align: center; }
+.action-tile-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; text-align: center; }
+.action-tile-admin {
+  background: linear-gradient(135deg, #fffbeb 0%, #fff 100%);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+.action-tile-admin .action-tile-icon { color: #d97706; }
+@media (min-width: 768px) {
+  .action-tile { min-height: 160px; padding: 1.75rem 1.25rem; }
+  .action-tile-icon { font-size: 2.75rem; }
+  .action-tile-title { font-size: 1.05rem; }
+}

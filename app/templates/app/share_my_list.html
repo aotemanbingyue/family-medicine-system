@@ -1,0 +1,76 @@
+{% extends 'app/base.html' %}
+{% block title %}我的帖子 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>我的帖子</h2>
+    <a href="{% url 'share_create' %}" class="btn btn-primary">发布转让</a>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>药品</th>
+                    <th>流程进度</th>
+                    <th>帖子审核</th>
+                    <th>药品审核</th>
+                    <th>发布时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in posts %}
+                <tr>
+                    <td>{{ p.title }}</td>
+                    <td>{{ p.medicine.name }}</td>
+                    <td style="min-width: 220px;">
+                        {% if p.status == 2 or p.medicine_audit_status == 2 %}
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" style="width: 100%;"></div>
+                        </div>
+                        <div class="small text-danger mt-1">审核驳回</div>
+                        {% elif p.status == 0 %}
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-secondary" style="width: 33%;"></div>
+                        </div>
+                        <div class="small text-muted mt-1">步骤1/3：等待帖子审核</div>
+                        {% elif p.status == 1 and p.medicine_audit_status == 0 %}
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: 66%;"></div>
+                        </div>
+                        <div class="small text-muted mt-1">步骤2/3：等待药品审核</div>
+                        {% elif p.status == 1 and p.medicine_audit_status == 1 %}
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 100%;"></div>
+                        </div>
+                        <div class="small text-success mt-1">步骤3/3：已上线可被加入药箱</div>
+                        {% else %}
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-secondary" style="width: 20%;"></div>
+                        </div>
+                        <div class="small text-muted mt-1">处理中</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if p.status == 0 %}<span class="badge bg-secondary">待审核</span>
+                        {% elif p.status == 1 %}<span class="badge bg-success">已通过</span>
+                        {% else %}<span class="badge bg-danger">已驳回</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if p.medicine_audit_status == -1 %}<span class="badge bg-secondary">待帖子审核</span>
+                        {% elif p.medicine_audit_status == 0 %}<span class="badge bg-warning text-dark">待药品审核</span>
+                        {% elif p.medicine_audit_status == 1 %}<span class="badge bg-success">已通过</span>
+                        {% else %}<span class="badge bg-danger">已驳回</span>{% endif %}
+                    </td>
+                    <td>{{ p.create_time }}</td>
+                    <td><a href="{% url 'share_detail' p.pk %}" class="btn btn-sm btn-outline-primary">查看</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted">暂无帖子，<a href="{% url 'share_create' %}">去发布</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

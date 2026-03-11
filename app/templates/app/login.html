@@ -1,0 +1,26 @@
+{% extends 'app/base.html' %}
+{% block title %}登录 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="row justify-content-center auth-card">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header">登录</div>
+            <div class="card-body">
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">用户名</label>
+                        <input type="text" name="username" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">密码</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">登录</button>
+                    <input type="hidden" name="next" value="{{ next }}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

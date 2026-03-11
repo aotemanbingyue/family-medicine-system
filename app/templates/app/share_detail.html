@@ -1,0 +1,74 @@
+{% extends 'app/base.html' %}
+{% block title %}{{ post.title }} - 药品管理系统{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'share_list' %}">共享广场</a></li>
+        <li class="breadcrumb-item active">{{ post.title }}</li>
+    </ol>
+</nav>
+<div class="card mb-4">
+    <div class="card-body">
+        <h2>{{ post.title }}</h2>
+        <p class="text-muted">发布人：{{ post.user.username }} · 发布时间：{{ post.create_time }}</p>
+        <p class="mb-2">
+            帖子审核：
+            {% if post.status == 1 %}<span class="badge bg-success">通过</span>
+            {% elif post.status == 0 %}<span class="badge bg-secondary">待审</span>
+            {% else %}<span class="badge bg-danger">驳回</span>{% endif %}
+            <span class="ms-2">药品审核：</span>
+            {% if post.medicine_audit_status == 1 %}<span class="badge bg-success">通过</span>
+            {% elif post.medicine_audit_status == -1 %}<span class="badge bg-secondary">待帖子审核</span>
+            {% elif post.medicine_audit_status == 0 %}<span class="badge bg-warning text-dark">待药品审核</span>
+            {% else %}<span class="badge bg-danger">驳回</span>{% endif %}
+        </p>
+        <p><strong>转让药品：</strong>{{ post.medicine.name }}（剩余 {{ post.medicine.stock }}{{ post.medicine.unit }}，过期日 {{ post.medicine.expiration_date }}）</p>
+        {% if can_add_to_box %}
+        <form method="post" action="{% url 'share_add_to_family_box' post.pk %}" class="mb-2">
+            {% csrf_token %}
+            {% if has_adopted %}
+            <button type="button" class="btn btn-outline-secondary btn-sm" disabled>已加入家庭药箱</button>
+            {% else %}
+            <button type="submit" class="btn btn-success btn-sm">加入我的家庭药箱</button>
+            {% endif %}
+        </form>
+        {% endif %}
+        <hr>
+        <div>{{ post.content|linebreaks }}</div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">留言互动</div>
+    <ul class="list-group list-group-flush">
+        {% for c, reply_list in comments_with_replies %}
+        <li class="list-group-item">
+            <strong>{{ c.user.username }}</strong> · {{ c.create_time }}<br>
+            {{ c.content }}
+            {% for r in reply_list %}
+            <div class="ms-4 mt-2 small border-start border-2 border-light ps-2">
+                <strong>{{ r.user.username }}</strong> 回复：{{ r.content }} <span class="text-muted">{{ r.create_time }}</span>
+            </div>
+            {% endfor %}
+            {% if is_post_owner %}
+            <form method="post" action="{% url 'share_reply' c.pk %}" class="mt-2 d-flex gap-2">
+                {% csrf_token %}
+                <input type="text" name="content" class="form-control form-control-sm" placeholder="回复 {{ c.user.username }}..." maxlength="300" required>
+                <button type="submit" class="btn btn-sm btn-outline-primary">回复</button>
+            </form>
+            {% endif %}
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">暂无留言</li>
+        {% endfor %}
+    </ul>
+    {% if form %}
+    <div class="card-footer">
+        <form method="post" action="{% url 'share_comment' post.pk %}">
+            {% csrf_token %}
+            {{ form.content }}
+            <button type="submit" class="btn btn-primary mt-2">留言</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

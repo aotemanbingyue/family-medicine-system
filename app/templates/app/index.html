@@ -1,0 +1,232 @@
+{% extends 'app/base.html' %}
+{% block title %}首页 - 药品管理系统{% endblock %}
+{% block content %}
+<div id="index-dashboard" class="index-dashboard">
+    <h2 class="mb-2">欢迎，{{ user.username }}</h2>
+    <p class="text-muted mb-4">点击下方功能卡片快速进入</p>
+
+    {% if announcements %}
+    <div class="card mb-4 rounded-4 shadow-sm">
+        <div class="card-header border-0 py-3 bg-transparent">
+            <i class="bi bi-megaphone me-2"></i>系统公告
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for a in announcements %}
+            <li class="list-group-item">
+                {% if a.is_pinned %}<span class="badge bg-warning text-dark me-2">置顶</span>{% endif %}
+                <strong>{{ a.title }}</strong> · <span class="text-muted small">{{ a.create_time }}</span>
+                <div class="mt-1 text-secondary small">{{ a.content|truncatewords:30 }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="card-footer bg-transparent border-0 py-2">
+            <a href="{% url 'announcement_list' %}" class="text-primary text-decoration-none">查看全部 <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 顶部统计区（Stats Cards） -->
+    <div class="row g-3 g-md-4 mb-4 mb-md-5">
+        <div class="col-6 col-md-3">
+            <div class="stat-card stat-card-blue rounded-4 shadow-sm">
+                <i class="bi bi-capsule-pill stat-card-icon"></i>
+                <div class="stat-card-num">{{ my_meds_count }}</div>
+                <div class="stat-card-label">家庭药箱</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'expiration_reminder' %}" class="text-decoration-none">
+                <div class="stat-card stat-card-red rounded-4 shadow-sm stat-card-hover">
+                    <i class="bi bi-clock-history stat-card-icon"></i>
+                    <div class="stat-card-num">{{ expiration_alert_count }}</div>
+                    <div class="stat-card-label">即将过期</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'share_my_list' %}" class="text-decoration-none">
+                <div class="stat-card stat-card-purple rounded-4 shadow-sm stat-card-hover">
+                    <i class="bi bi-file-earmark-text stat-card-icon"></i>
+                    <div class="stat-card-num">{{ my_posts_count }}</div>
+                    <div class="stat-card-label">我的帖子</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'message_inbox' %}" class="text-decoration-none">
+                <div class="stat-card stat-card-teal rounded-4 shadow-sm stat-card-hover">
+                    <i class="bi bi-envelope stat-card-icon"></i>
+                    <div class="stat-card-num">{{ unread_comment_count|default:0 }}</div>
+                    <div class="stat-card-label">未读消息</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 核心功能区（Main Action Grid） -->
+    <h5 class="mb-3 fw-semibold text-secondary">功能入口</h5>
+    <div class="row row-cols-2 row-cols-md-4 g-3 g-md-4">
+        <div class="col">
+            <a href="{% url 'family_medicine_list' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-capsule-pill action-tile-icon"></i>
+                <span class="action-tile-title">家庭药箱</span>
+                <span class="action-tile-desc">共 {{ my_meds_count }} 种</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'expiration_reminder' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-clock-history action-tile-icon"></i>
+                <span class="action-tile-title">过期提醒</span>
+                <span class="action-tile-desc">{{ expiration_alert_count }} 种即将过期</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'taking_reminder' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-alarm action-tile-icon"></i>
+                <span class="action-tile-title">服药提醒</span>
+                <span class="action-tile-desc">{{ taking_reminder_count|default:0 }} 种已开启</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'family_group' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-people action-tile-icon"></i>
+                <span class="action-tile-title">家庭组</span>
+                <span class="action-tile-desc">家人药箱共享</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'share_list' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-basket action-tile-icon"></i>
+                <span class="action-tile-title">浏览转让</span>
+                <span class="action-tile-desc">查看闲置药品</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'share_my_list' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-file-earmark-text action-tile-icon"></i>
+                <span class="action-tile-title">我的帖子</span>
+                <span class="action-tile-desc">{{ my_posts_count }} 条</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'message_inbox' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-envelope action-tile-icon"></i>
+                <span class="action-tile-title">消息中心</span>
+                <span class="action-tile-desc">{% if unread_comment_count %}{{ unread_comment_count }} 条未读{% else %}暂无新消息{% endif %}</span>
+            </a>
+        </div>
+        <div class="col">
+            {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
+            <a href="{% url 'private_message_admin_inbox' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-chat-dots action-tile-icon"></i>
+                <span class="action-tile-title">私聊收件箱</span>
+                <span class="action-tile-desc">查看用户咨询</span>
+            </a>
+            {% else %}
+            <a href="{% url 'private_message_admin_select' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-chat-dots action-tile-icon"></i>
+                <span class="action-tile-title">联系管理员</span>
+                <span class="action-tile-desc">私聊咨询问题</span>
+            </a>
+            {% endif %}
+        </div>
+        <div class="col">
+            <a href="{% url 'global_medicine_search' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-search action-tile-icon"></i>
+                <span class="action-tile-title">药品查询</span>
+                <span class="action-tile-desc">查标准药库</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'announcement_list' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-megaphone action-tile-icon"></i>
+                <span class="action-tile-title">系统公告</span>
+                <span class="action-tile-desc">查看公告</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'medical_tip_list' %}" class="action-tile rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-heart-pulse action-tile-icon"></i>
+                <span class="action-tile-title">医学小贴士</span>
+                <span class="action-tile-desc">{% if latest_tip %}{{ latest_tip.tip_date }}{% else %}查看科普{% endif %}</span>
+            </a>
+        </div>
+        {% if user.role == 'admin_user' or user.role == 'admin_sys' %}
+        <div class="col">
+            <a href="{% url 'user_admin_list' %}" class="action-tile action-tile-admin rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-person-gear action-tile-icon"></i>
+                <span class="action-tile-title">用户管理</span>
+                <span class="action-tile-desc">账号维护</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'user_admin_family_join_requests' %}" class="action-tile action-tile-admin rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-person-check action-tile-icon"></i>
+                <span class="action-tile-title">入组审核</span>
+                <span class="action-tile-desc">{% if pending_family_join_count %}{{ pending_family_join_count }} 待审{% else %}审核{% endif %}</span>
+            </a>
+        </div>
+        {% endif %}
+        {% if user.role == 'admin_med' or user.role == 'admin_sys' %}
+        <div class="col">
+            <a href="{% url 'global_medicine_list' %}" class="action-tile action-tile-admin rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-journal-medical action-tile-icon"></i>
+                <span class="action-tile-title">标准药库</span>
+                <span class="action-tile-desc">管理</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'family_medicine_audit_list' %}" class="action-tile action-tile-admin rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-clipboard2-pulse action-tile-icon"></i>
+                <span class="action-tile-title">药箱药品审核</span>
+                <span class="action-tile-desc">{% if pending_family_medicine_count %}{{ pending_family_medicine_count }} 待审{% else %}审核{% endif %}</span>
+            </a>
+        </div>
+        <div class="col">
+            <a href="{% url 'post_medicine_audit_list' %}" class="action-tile action-tile-admin rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-clipboard-check action-tile-icon"></i>
+                <span class="action-tile-title">帖子药品审核</span>
+                <span class="action-tile-desc">审核后可入药箱</span>
+            </a>
+        </div>
+        {% endif %}
+        {% if user.role == 'admin_post' or user.role == 'admin_sys' %}
+        <div class="col">
+            <a href="{% url 'post_audit_list' %}" class="action-tile action-tile-admin rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-check2-square action-tile-icon"></i>
+                <span class="action-tile-title">帖子审核</span>
+                <span class="action-tile-desc">{% if pending_audit_count %}{{ pending_audit_count }} 待审{% else %}审核{% endif %}</span>
+            </a>
+        </div>
+        {% endif %}
+        {% if user.role == 'admin_sys' %}
+        <div class="col">
+            <a href="{% url 'announcement_create' %}" class="action-tile action-tile-admin rounded-4 shadow-sm text-decoration-none">
+                <i class="bi bi-broadcast action-tile-icon"></i>
+                <span class="action-tile-title">发布公告</span>
+                <span class="action-tile-desc">管理</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+ </div>
+
+{% if expiring_soon %}
+<div class="card mt-4 rounded-4 shadow-sm">
+    <div class="card-header border-0 py-3 bg-transparent">
+        <i class="bi bi-clock-history me-2"></i>即将过期（最近 5 条）
+    </div>
+    <ul class="list-group list-group-flush">
+        {% for m in expiring_soon %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ m.name }}</span>
+            <span class="badge bg-warning text-dark">过期日 {{ m.expiration_date }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="card-footer bg-transparent border-0 py-2">
+        <a href="{% url 'expiration_reminder' %}" class="text-primary text-decoration-none">查看全部 <i class="bi bi-arrow-right"></i></a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
