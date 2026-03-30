@@ -1,9 +1,9 @@
 {% extends 'app/base.html' %}
-{% block title %}共享广场 - 药品管理系统{% endblock %}
+{% block title %}家庭组互助转让 - 药品管理系统{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>共享广场</h2>
-    {% if user.is_authenticated %}<a href="{% url 'share_create' %}" class="btn btn-primary">发布转让</a>{% endif %}
+    <h2>🤝 家庭组互助转让</h2>
+    <a href="{% url 'share_create' %}" class="btn btn-primary">发布转让</a>
 </div>
 <div class="row g-4">
     {% for p in posts %}
@@ -23,7 +23,7 @@
         </div>
     </div>
     {% empty %}
-    <div class="col-12 text-center text-muted py-5">暂无已通过审核的转让帖子</div>
+    <div class="col-12 text-center text-muted py-5">本家庭组暂无互助转让帖子</div>
     {% endfor %}
 </div>
 {% endblock %}

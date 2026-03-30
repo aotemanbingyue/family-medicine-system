@@ -27,6 +27,15 @@ DEFAULT_GLOBAL_MEDICINES = [
     ("葡萄糖酸钙口服液", "儿童", "6901234567809", "用于预防和治疗钙缺乏症，如骨质疏松、手足抽搐症、骨发育不全等。"),
 ]
 
+RX_NAME_KEYWORDS = ("阿莫西林", "头孢", "阿奇霉素", "硝苯地平", "氨氯地平", "二甲双胍", "阿卡波糖")
+
+
+def _infer_rx_otc(name: str) -> str:
+    for kw in RX_NAME_KEYWORDS:
+        if kw in name:
+            return "RX"
+    return "OTC"
+
 
 def sync_default_global_medicines(overwrite=False):
     """
@@ -42,10 +51,12 @@ def sync_default_global_medicines(overwrite=False):
     restored = 0
 
     for name, category, barcode, description in DEFAULT_GLOBAL_MEDICINES:
+        rx_otc = _infer_rx_otc(name)
         obj, created = GlobalMedicine.objects.get_or_create(
             barcode=barcode,
             defaults={
                 "name": name,
+                "rx_otc": rx_otc,
                 "category": category,
                 "description": description,
                 "is_deleted": False,
@@ -58,6 +69,9 @@ def sync_default_global_medicines(overwrite=False):
         changed = False
         if obj.name != name:
             obj.name = name
+            changed = True
+        if obj.rx_otc != rx_otc:
+            obj.rx_otc = rx_otc
             changed = True
         if obj.category != category:
             obj.category = category

@@ -13,6 +13,10 @@
                     <th>帖子标题</th>
                     <th>发布人</th>
                     <th>药品</th>
+                    <th>药品类型</th>
+                    <th>用途分类</th>
+                    <th>批准文号/条码</th>
+                    <th>厂家/规格</th>
                     <th>过期日期</th>
                     <th>发布时间</th>
                     <th>操作</th>
@@ -24,6 +28,10 @@
                     <td>{{ p.title }}</td>
                     <td>{{ p.user.username }}</td>
                     <td>{{ p.medicine.name }}</td>
+                    <td>{% if p.medicine.global_info %}{{ p.medicine.global_info.get_rx_otc_display }}{% else %}—{% endif %}</td>
+                    <td>{% if p.medicine.global_info %}{{ p.medicine.global_info.get_category_display }}{% else %}—{% endif %}</td>
+                    <td>{% if p.medicine.global_info %}{{ p.medicine.global_info.approval_number|default:p.medicine.global_info.barcode }}{% else %}—{% endif %}</td>
+                    <td>{% if p.medicine.global_info %}{{ p.medicine.global_info.manufacturer|default:'—' }} / {{ p.medicine.global_info.specification|default:'—' }}{% else %}—{% endif %}</td>
                     <td>{{ p.medicine.expiration_date }}</td>
                     <td>{{ p.create_time }}</td>
                     <td>
@@ -39,7 +47,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center text-muted">暂无待审核帖子药品</td></tr>
+                <tr><td colspan="10" class="text-center text-muted">暂无待审核帖子药品</td></tr>
                 {% endfor %}
             </tbody>
         </table>

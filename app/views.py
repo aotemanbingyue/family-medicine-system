@@ -30,6 +30,7 @@ from .forms import (
     SystemAnnouncementForm,
     PrivateMessageForm,
     MedicalTipForm,
+    ChangePasswordForm,
 )
 from .decorators import role_required
 from .medical_tip_auto import publish_auto_tip_for_date
@@ -55,6 +56,23 @@ def index(request):
         'announcements': announcements,
         'latest_tip': latest_tip,
     })
+
+
+@login_required
+def profile(request):
+    """个人信息页：查看账号信息 + 修改密码。"""
+    if request.method == "POST":
+        form = ChangePasswordForm(request.user, request.POST)
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data["new_password1"])
+            request.user.save(update_fields=["password"])
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "密码已修改成功。")
+            return redirect("profile")
+    else:
+        form = ChangePasswordForm(request.user)
+    return render(request, "app/profile.html", {"pwd_form": form})
 
 
 def register(request):
@@ -238,21 +256,35 @@ def family_group_manage(request):
     return render(request, 'app/family_group_manage.html', {'form': form})
 
 
-# ---------- 共享广场 ----------
+# ---------- 互助转让 ----------
+@login_required
 def share_list(request):
-    # 共享广场仅展示“帖子审核通过 + 帖子药品审核通过”的内容
+    """
+    互助转让列表：仅展示与当前用户同家庭组、且双审核通过的帖子。
+    未加入家庭组的用户无法浏览，引导其先加入家庭组。
+    """
+    fid = request.user.family_id
+    if not fid:
+        messages.warning(request, "请先加入或创建家庭组，才能浏览互助转让帖子。")
+        return redirect('family_group_manage')
     qs = SharePost.objects.filter(
         is_deleted=False,
         status=1,
         medicine_audit_status=1,
+        user__family_id=fid,
     ).select_related('user', 'medicine').order_by('-create_time')
     return render(request, 'app/share_list.html', {'posts': qs})
 
 
 def share_detail(request, pk):
     post = get_object_or_404(SharePost, pk=pk, is_deleted=False)
-    # 非发布人查看时，帖子与帖子药品均需通过审核
-    if (post.status != 1 or post.medicine_audit_status != 1) and post.user_id != request.user.id:
+    # 发布人、药品管理员、系统管理员可绕过审核状态直接查看
+    is_auditor = (
+        request.user.is_authenticated
+        and request.user.role in ("admin_med", "admin_sys")
+    )
+    is_owner = request.user.is_authenticated and request.user.id == post.user_id
+    if (post.status != 1 or post.medicine_audit_status != 1) and not is_owner and not is_auditor:
         messages.error(request, '该帖子未通过审核或已下架。')
         return redirect('share_list')
     comments = PostComment.objects.filter(post=post).select_related('user').order_by('create_time')
@@ -595,23 +627,30 @@ def private_message_chat_with_user(request, user_id):
 
 # ---------- 普通用户：查询全局药品库（只读）----------
 def global_medicine_search(request):
-    """普通用户可查询全局药品库，支持按名称、分类、条形码筛选。数据来自药品管理员维护的本地库。"""
+    """普通用户可查询全局药品库，支持按名称、药品类型、用途分类、条形码筛选。"""
     qs = GlobalMedicine.objects.filter(is_deleted=False)
     keyword = request.GET.get('q', '').strip()
+    rx_otc = request.GET.get('rx_otc', '').strip()
     category = request.GET.get('category', '').strip()
     if keyword:
         qs = qs.filter(Q(name__icontains=keyword) | Q(barcode__icontains=keyword))
+    if rx_otc:
+        qs = qs.filter(rx_otc=rx_otc)
     if category:
         qs = qs.filter(category=category)
-    qs = qs.order_by('category', 'name')
-    return render(request, 'app/global_medicine_search.html', {'medicines': qs, 'keyword': keyword, 'category': category})
+    qs = qs.order_by('rx_otc', 'category', 'name')
+    return render(
+        request,
+        'app/global_medicine_search.html',
+        {'medicines': qs, 'keyword': keyword, 'category': category, 'rx_otc': rx_otc},
+    )
 
 
 # ---------- 药品管理员：全局药库（按角色限制）----------
 @login_required
 @role_required('admin_med', 'admin_sys')
 def global_medicine_list(request):
-    qs = GlobalMedicine.objects.filter(is_deleted=False).order_by('category', 'name')
+    qs = GlobalMedicine.objects.filter(is_deleted=False).order_by('rx_otc', 'category', 'name')
     return render(request, 'app/global_medicine_list.html', {'medicines': qs})
 
 

@@ -9,9 +9,13 @@
                 <tr>
                     <th>归属用户</th>
                     <th>药品名称</th>
-                    <th>分类</th>
+                    <th>药品类型</th>
+                    <th>用途分类</th>
+                    <th>批准文号/条码</th>
+                    <th>厂家/规格</th>
                     <th>生产/过期日期</th>
                     <th>剩余</th>
+                    <th>用药提示</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -20,9 +24,13 @@
                 <tr>
                     <td>{{ m.owner.username }}</td>
                     <td>{{ m.name }}</td>
+                    <td>{% if m.global_info %}{{ m.global_info.get_rx_otc_display }}{% else %}—{% endif %}</td>
                     <td>{% if m.global_info %}{{ m.global_info.get_category_display }}{% else %}—{% endif %}</td>
+                    <td>{% if m.global_info %}{{ m.global_info.approval_number|default:m.global_info.barcode }}{% else %}—{% endif %}</td>
+                    <td>{% if m.global_info %}{{ m.global_info.manufacturer|default:'—' }} / {{ m.global_info.specification|default:'—' }}{% else %}—{% endif %}</td>
                     <td>{{ m.production_date }} / {{ m.expiration_date }}</td>
                     <td>{{ m.stock }}{{ m.unit }}</td>
+                    <td>{{ m.dosage_note|default:"—" }}</td>
                     <td>
                         <div class="d-flex gap-1">
                             <form method="post" action="{% url 'family_medicine_audit_approve' m.pk %}">
@@ -37,7 +45,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center text-muted">暂无待审核药品</td></tr>
+                <tr><td colspan="10" class="text-center text-muted">暂无待审核药品</td></tr>
                 {% endfor %}
             </tbody>
         </table>

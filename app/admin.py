@@ -16,11 +16,11 @@ admin.site.register(User, UserAdmin)
 @admin.register(GlobalMedicine)
 class GlobalMedicineAdmin(admin.ModelAdmin):
     # 后台列表显示哪些字段
-    list_display = ('name', 'category', 'barcode', 'is_deleted')
+    list_display = ('name', 'rx_otc', 'category', 'approval_number', 'barcode', 'is_deleted')
     # 增加搜索框
-    search_fields = ('name', 'barcode')
+    search_fields = ('name', 'barcode', 'approval_number', 'manufacturer')
     # 增加过滤器
-    list_filter = ('category', 'is_deleted')
+    list_filter = ('rx_otc', 'category', 'is_deleted')
 
 # 3. 注册家庭药箱
 @admin.register(FamilyMedicine)

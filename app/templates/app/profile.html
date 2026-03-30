@@ -1,0 +1,67 @@
+{% extends 'app/base.html' %}
+{% block title %}个人信息 - 药品管理系统{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+
+    <h2 class="mb-4">个人信息</h2>
+
+    {% if messages %}
+    {% for m in messages %}
+    <div class="alert alert-{{ m.tags }} alert-dismissible fade show" role="alert">
+      {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {# ── 基本信息展示 ── #}
+    <div class="card mb-4">
+      <div class="card-header">账号信息</div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted">用户名</span><span>{{ user.username }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted">角色</span><span>{{ user.get_role_display }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted">手机号</span><span>{{ user.phone|default:"未填写" }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted">身份证号</span>
+          <span>
+            {% if user.id_card %}
+              {{ user.id_card|slice:":6" }}****{{ user.id_card|slice:"-4:" }}
+            {% else %}未填写{% endif %}
+          </span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted">家庭组ID</span><span>{{ user.family_id|default:"未加入家庭组" }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span class="text-muted">注册时间</span><span>{{ user.date_joined|date:"Y-m-d H:i" }}</span>
+        </li>
+      </ul>
+    </div>
+
+    {# ── 修改密码 ── #}
+    <div class="card">
+      <div class="card-header">修改密码</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {% for field in pwd_form %}
+          <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary">确认修改密码</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

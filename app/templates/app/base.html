@@ -32,10 +32,10 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">🔄 共享转让</a>
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">🤝 互助转让</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'share_list' %}">浏览转让</a></li>
-                            <li><a class="dropdown-item" href="{% url 'share_my_list' %}">我的帖子{% if my_posts_alert_count %} <span class="badge bg-warning text-dark ms-1">{{ my_posts_alert_count }}</span>{% endif %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'share_list' %}">家庭组互助</a></li>
+                            <li><a class="dropdown-item" href="{% url 'share_my_list' %}">我的发布{% if my_posts_alert_count %} <span class="badge bg-warning text-dark ms-1">{{ my_posts_alert_count }}</span>{% endif %}</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'message_inbox' %}">消息中心{% if unread_comment_count %} <span class="badge bg-danger ms-1">{{ unread_comment_count }}</span>{% endif %}</a></li>
                             {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
@@ -49,7 +49,6 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'global_medicine_search' %}">🔍 药品查询</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'announcement_list' %}">📢 系统公告</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'medical_tip_list' %}">🩺 医学小贴士</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'article_list' %}">📖 外刊阅读</a></li>
                     {% if user.is_authenticated %}
                     {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
                     <li class="nav-item dropdown">
@@ -81,6 +80,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="userDropdown">{{ user.username }} <span class="badge {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}badge-role-admin{% else %}badge-role-user{% endif %}">{{ user.get_role_display }}</span></a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">个人信息</a></li>
                             <li><a class="dropdown-item" href="{% url 'message_inbox' %}">消息中心{% if unread_comment_count %}<span class="badge bg-danger ms-1">{{ unread_comment_count }}</span>{% endif %}</a></li>
                             {% if user.role == 'admin_user' or user.role == 'admin_med' or user.role == 'admin_post' or user.role == 'admin_sys' %}
                             <li><a class="dropdown-item" href="{% url 'private_message_admin_inbox' %}">私聊收件箱</a></li>

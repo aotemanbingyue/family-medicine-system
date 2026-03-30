@@ -19,6 +19,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user', verbose_name="角色身份")
     
     phone = models.CharField(max_length=11, verbose_name="手机号", blank=True)
+    id_card = models.CharField(max_length=18, verbose_name="身份证号", blank=True)
     family_id = models.CharField(max_length=20, verbose_name="家庭组ID", blank=True, null=True, help_text="同一ID视为一家人")
     
     class Meta:
@@ -30,9 +31,19 @@ class User(AbstractUser):
 # ==================================
 # 这是给"药品管理员"维护的“字典”，用户不能改，只能查
 class GlobalMedicine(models.Model):
+    RX_OTC_CHOICES = (
+        ("RX", "处方药"),
+        ("OTC", "非处方药"),
+    )
     name = models.CharField(max_length=100, verbose_name="药品通用名")
-    category = models.CharField(max_length=50, verbose_name="分类", choices=(('感冒', '感冒类'), ('消炎', '消炎类'), ('慢性病', '慢性病'), ('儿童', '儿童用药')))
+    # 政策导向分类：处方药 / 非处方药
+    rx_otc = models.CharField(max_length=3, choices=RX_OTC_CHOICES, default="OTC", verbose_name="药品类型")
+    # 业务分类保留用于检索（如感冒/消炎等）
+    category = models.CharField(max_length=50, verbose_name="用途分类", choices=(('感冒', '感冒类'), ('消炎', '消炎类'), ('慢性病', '慢性病'), ('儿童', '儿童用药')))
     barcode = models.CharField(max_length=50, verbose_name="条形码/国药准字", unique=True)
+    manufacturer = models.CharField(max_length=120, verbose_name="生产厂家", blank=True)
+    specification = models.CharField(max_length=120, verbose_name="规格", blank=True)
+    approval_number = models.CharField(max_length=60, verbose_name="批准文号", blank=True)
     description = models.TextField(verbose_name="说明书/功效", blank=True)
     
     # 【核心难点解决】软删除标记

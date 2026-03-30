@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+import re
 from .models import User, FamilyMedicine, SharePost, PostComment, CommentReply, GlobalMedicine, SystemAnnouncement, PrivateMessage, MedicalTip
 
 
@@ -13,17 +14,32 @@ def _bootstrap_class(attrs=None):
 
 class RegisterForm(UserCreationForm):
     phone = forms.CharField(max_length=11, required=False, label='手机号', widget=forms.TextInput(attrs=_bootstrap_class()))
+    id_card = forms.CharField(max_length=18, required=True, label='身份证号', widget=forms.TextInput(attrs=_bootstrap_class({'placeholder': '18位身份证号'})))
     family_id = forms.CharField(max_length=20, required=False, label='家庭组ID', help_text='与家人填写相同ID即可成组', widget=forms.TextInput(attrs=_bootstrap_class()))
 
     class Meta:
         model = User
-        fields = ('username', 'phone', 'family_id', 'password1', 'password2')
+        fields = ('username', 'phone', 'id_card', 'family_id', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name in ('username', 'password1', 'password2'):
             if name in self.fields:
                 self.fields[name].widget.attrs.update(_bootstrap_class())
+
+    def clean_id_card(self):
+        id_card = (self.cleaned_data.get("id_card") or "").strip().upper()
+        if not re.fullmatch(r"\d{17}[\dX]", id_card):
+            raise forms.ValidationError("身份证号格式不正确，应为18位（最后一位可为X）。")
+        # 中国居民身份证校验码算法
+        weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+        mapping = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
+        total = sum(int(id_card[i]) * weights[i] for i in range(17))
+        if mapping[total % 11] != id_card[-1]:
+            raise forms.ValidationError("身份证号校验失败，请确认填写正确。")
+        if User.objects.filter(id_card=id_card).exists():
+            raise forms.ValidationError("该身份证号已注册。")
+        return id_card
 
 
 class FamilyMedicineForm(forms.ModelForm):
@@ -87,11 +103,15 @@ class CommentReplyForm(forms.ModelForm):
 class GlobalMedicineForm(forms.ModelForm):
     class Meta:
         model = GlobalMedicine
-        fields = ('name', 'category', 'barcode', 'description')
+        fields = ('name', 'rx_otc', 'category', 'barcode', 'manufacturer', 'specification', 'approval_number', 'description')
         widgets = {
             'name': forms.TextInput(attrs=_bootstrap_class()),
+            'rx_otc': forms.Select(attrs=_bootstrap_class()),
             'category': forms.Select(attrs=_bootstrap_class()),
             'barcode': forms.TextInput(attrs=_bootstrap_class()),
+            'manufacturer': forms.TextInput(attrs=_bootstrap_class()),
+            'specification': forms.TextInput(attrs=_bootstrap_class()),
+            'approval_number': forms.TextInput(attrs=_bootstrap_class()),
             'description': forms.Textarea(attrs=_bootstrap_class()),
         }
 
@@ -142,6 +162,40 @@ class PrivateMessageForm(forms.ModelForm):
                 )
             )
         }
+
+
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(
+        label="当前密码",
+        widget=forms.PasswordInput(attrs=_bootstrap_class()),
+    )
+    new_password1 = forms.CharField(
+        label="新密码",
+        min_length=6,
+        widget=forms.PasswordInput(attrs=_bootstrap_class()),
+    )
+    new_password2 = forms.CharField(
+        label="确认新密码",
+        widget=forms.PasswordInput(attrs=_bootstrap_class()),
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self._user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        pw = self.cleaned_data.get("old_password")
+        if not self._user.check_password(pw):
+            raise forms.ValidationError("当前密码不正确。")
+        return pw
+
+    def clean(self):
+        data = super().clean()
+        p1 = data.get("new_password1")
+        p2 = data.get("new_password2")
+        if p1 and p2 and p1 != p2:
+            self.add_error("new_password2", "两次输入的新密码不一致。")
+        return data
 
 
 class MedicalTipForm(forms.ModelForm):

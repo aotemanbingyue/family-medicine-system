@@ -29,6 +29,7 @@
                     <th>用户名</th>
                     <th>角色</th>
                     <th>手机号</th>
+                    <th>身份证号</th>
                     <th>家庭组ID</th>
                     <th>状态</th>
                     <th>操作</th>
@@ -40,6 +41,7 @@
                     <td>{{ u.username }}</td>
                     <td><span class="badge bg-light text-dark">{{ u.get_role_display }}</span></td>
                     <td>{{ u.phone|default:'-' }}</td>
+                    <td>{{ u.id_card|default:'-' }}</td>
                     <td>{{ u.family_id|default:'-' }}</td>
                     <td>
                         {% if u.is_active %}
@@ -64,7 +66,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center text-muted">暂无匹配用户</td></tr>
+                <tr><td colspan="7" class="text-center text-muted">暂无匹配用户</td></tr>
                 {% endfor %}
             </tbody>
         </table>

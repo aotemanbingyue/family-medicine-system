@@ -23,8 +23,11 @@
             <thead>
                 <tr>
                     <th>通用名</th>
-                    <th>分类</th>
-                    <th>条形码/国药准字</th>
+                    <th>药品类型</th>
+                    <th>用途分类</th>
+                    <th>批准文号/条形码</th>
+                    <th>生产厂家</th>
+                    <th>规格</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -32,15 +35,18 @@
                 {% for m in medicines %}
                 <tr>
                     <td>{{ m.name }}</td>
+                    <td>{{ m.get_rx_otc_display }}</td>
                     <td>{{ m.get_category_display }}</td>
-                    <td>{{ m.barcode }}</td>
+                    <td>{{ m.approval_number|default:m.barcode }}</td>
+                    <td>{{ m.manufacturer|default:"—" }}</td>
+                    <td>{{ m.specification|default:"—" }}</td>
                     <td>
                         <a href="{% url 'global_medicine_edit' m.pk %}" class="btn btn-sm btn-outline-primary">编辑</a>
                         <a href="{% url 'global_medicine_delete' m.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定软删除？');">删除</a>
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" class="text-center text-muted">暂无标准药品</td></tr>
+                <tr><td colspan="7" class="text-center text-muted">暂无标准药品</td></tr>
                 {% endfor %}
             </tbody>
         </table>
